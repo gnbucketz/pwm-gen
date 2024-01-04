@@ -1,0 +1,23 @@
+`timescale 1ns / 1ps
+
+module testb;
+  reg clk = 0;
+  wire led;
+
+  top UUT (clk, led);
+
+  always #5 clk = ~clk;
+
+  initial begin
+    $dumpfile("waveform.vcd"); // Output waveform to a VCD file
+    $dumpvars(0, testb); // Dump signals
+
+    // Simulate for a period of time
+    #1000; // Adjust the simulation time as needed
+
+    // Optionally monitor LED behavior
+    $display("LED signal: %b", led);
+
+    $finish; // End simulation
+  end
+endmodule
