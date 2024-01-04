@@ -1,0 +1,40 @@
+module pwm_generator(
+    input wire clk,
+    input wire rst,     // Reset signal
+    input wire increase_duty,  // Signal to increase duty cycle
+    input wire decrease_duty,  // Signal to decrease duty cycle
+    output reg pwm
+);
+
+reg [7:0] counter = 0;
+parameter PWM_MAX_VALUE = 100;           // Maximum value for the counter
+parameter PWM_MIN_VALUE = 0;             // Minimum value for the counter
+parameter PWM_INITIAL_THRESHOLD = 20;    // Initial PWM threshold value for duty cycle
+reg [7:0] pwm_threshold = PWM_INITIAL_THRESHOLD; // PWM threshold register
+
+always @(posedge clk or posedge rst) begin
+    if (rst) begin
+        counter <= 0;
+        pwm_threshold <= PWM_INITIAL_THRESHOLD;
+    end else begin
+        if (counter < PWM_MAX_VALUE) begin
+            counter <= counter + 1;
+        end else begin
+            counter <= 0;
+        end
+        
+        // Logic to increase or decrease duty cycle
+        if (increase_duty && (pwm_threshold < PWM_MAX_VALUE)) begin
+            pwm_threshold <= pwm_threshold + 1;
+        end
+        if (decrease_duty && (pwm_threshold > PWM_MIN_VALUE)) begin
+            pwm_threshold <= pwm_threshold - 1;
+        end
+    end
+end
+
+always @(*) begin
+    pwm = (counter < pwm_threshold) ? 1'b1 : 1'b0;
+end
+
+endmodule
